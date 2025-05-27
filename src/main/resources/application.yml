@@ -1,0 +1,66 @@
+# application port number
+server:
+  port: 8082
+
+spring:
+
+  # setting application name
+  application:
+    name: inventoryservice
+
+  # database configs
+  datasource:
+    url: jdbc:mysql://localhost:3306/ObviousAI
+    username: abc
+    password: abc
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # jpa properties
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        # To give the table name and column names as variable name by default. It was taking some other defaults
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  # Config server
+  config:
+    import: optional:configserver:http://localhost:8091
+
+# Security configs. Somehow not working right now. I think for token processing and authenticating.
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: https://dev-zrv8mh7b8k6bay3x.us.auth0.com/
+#      # no need of client configs as it do not do any https calls for which it requires client
+#      client:
+#        registration:
+#          my-internal-client:
+#            client-id: AZdNvbdC7RErJi42eGU7Wqx3BHarHxAW   # YOUR_CLIENT_ID
+#            client-secret: bx4jVFvTxZSUhahJkrh-bpI1Fi_MaaPQOyp79_W_Q6TGgECiXQKywgAtBpAQCvWV # YOUR_CLIENT_SECRET
+##            client-name: Auth0
+#            provider: auth0
+#            authorization-grant-type: client_credentials # this is different from gateway
+##            redirect-uri: "http://localhost:8090/login/oauth2/code/auth0"
+#            scope: internal
+#
+#        provider:
+#          auth0:
+#            issuer-uri: https://dev-zrv8mh7b8k6bay3x.us.auth0.com/
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# Eureka service discovery/registry configs - Now moved to config server
+#eureka:
+#  instance:
+#    preferIpAddress: true
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
