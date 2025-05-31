@@ -1,0 +1,21 @@
+spring:
+
+  # database configs
+  datasource:
+    url: jdbc:mysql://localhost:3306/ObviousAITest
+    username: allego
+    password: allego
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # jpa properties
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        # To give the table name and column names as variable name by default. It was taking some other defaults
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  cloud:
+    config:
+      enabled: false

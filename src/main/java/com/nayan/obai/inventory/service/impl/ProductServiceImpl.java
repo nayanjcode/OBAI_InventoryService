@@ -23,10 +23,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ProductServiceImpl implements ProductService
 {
+	private RedissonClient redissonClient;
+
+	private RLock rLock;
+
 	@Autowired
 	ProductRepository productRepository;
-
-	private RedissonClient redissonClient;
 
 	@Autowired
 	private ReservationRepository reservationRepository;
@@ -34,6 +36,14 @@ public class ProductServiceImpl implements ProductService
 	public ProductServiceImpl(RedissonClient redissonClient)
 	{
 		this.redissonClient = redissonClient;
+	}
+
+	public ProductServiceImpl(final ProductRepository productRepository, final ReservationRepository reservationRepository, final RedissonClient redissonClient, final RLock rLock)
+	{
+		this.productRepository = productRepository;
+		this.reservationRepository = reservationRepository;
+		this.redissonClient = redissonClient;
+		this.rLock = rLock;
 	}
 
 	@Override
@@ -139,7 +149,7 @@ public class ProductServiceImpl implements ProductService
 
 		// update product stock
 		productOrderReservations.forEach((productOrderReservation -> {
-			productRepository.updateQuantityByProductId(productOrderReservation.getProductId(), productOrderReservation.getReservedQuantity());
+			productRepository.deductQuantityByProductId(productOrderReservation.getProductId(), productOrderReservation.getReservedQuantity());
 		}));
 
 		// remove reserved stock
