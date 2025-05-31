@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, UUID>
 {
 	@Modifying
-	@Query(value = "UPDATE Product SET quantity = :quantity WHERE productId = :productId", nativeQuery = true)
-	void updateQuantityByProductId(@Param("productId") UUID productId, @Param("quantity") int quantity);
+	@Query(value = "UPDATE Product SET quantity = quantity - :quantity WHERE productId = :productId", nativeQuery = true)
+	void deductQuantityByProductId(@Param("productId") UUID productId, @Param("quantity") int quantity);
 
 }
