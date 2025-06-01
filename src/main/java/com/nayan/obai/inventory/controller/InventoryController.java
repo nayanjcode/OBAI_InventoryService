@@ -6,7 +6,7 @@ import com.nayan.obai.inventory.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +24,7 @@ public class InventoryController
 	@Autowired
 	private ProductService productService;
 
-//	@PreAuthorize("hasAuthority('internal')")
+	@PreAuthorize("hasRole('REGULAR_USERS')")
 	@GetMapping("/{productId}")
 	public ResponseEntity<Product> getProduct(@PathVariable UUID productId)
 	{
@@ -32,7 +32,7 @@ public class InventoryController
 		return ResponseEntity.ok(product);
 	}
 
-//	@PreAuthorize("hasAuthority('Admin')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/")
 	public ResponseEntity<Product> saveProduct(@RequestBody Product product)
 	{
@@ -48,6 +48,7 @@ public class InventoryController
 		return ResponseEntity.status(HttpStatus.CREATED).body(updatedProduct);
 	}
 
+	@PreAuthorize("hasRole('REGULAR_USERS')")
 	@GetMapping("/")
 	public ResponseEntity<List<Product>> getProducts()
 	{
@@ -55,6 +56,7 @@ public class InventoryController
 		return ResponseEntity.ok(products);
 	}
 
+	@PreAuthorize("hasRole('REGULAR_USER')")
 	@PostMapping("/validate")
 	public ResponseEntity<Boolean> validateAndReserveProductStock(@RequestBody OrderProduct orderProduct)
 	{

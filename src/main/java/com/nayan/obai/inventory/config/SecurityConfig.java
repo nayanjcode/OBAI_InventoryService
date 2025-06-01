@@ -1,30 +1,58 @@
-//package com.nayan.obai.inventory.config;
-//
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.Customizer;
-//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.web.SecurityFilterChain;
-//
-//@Configuration
-//@EnableWebSecurity
-//@EnableMethodSecurity(prePostEnabled = true)
-//public class SecurityConfig
-//{
-//	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception
-//	{
-//		http
-//				.authorizeHttpRequests(authorize -> authorize
-//						.requestMatchers("/login**", "/oauth2/**").permitAll()
-//						.requestMatchers("/inventory/**").authenticated()
-//						.anyRequest().permitAll()
-//				)
-////				.oauth2Login(Customizer.withDefaults()) // Auth0 login flow
+package com.nayan.obai.inventory.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig
+{
+	@Bean
+	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception
+	{
+		http
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers("/login**", "/oauth2/**", "/actuator/**").permitAll()
+						.requestMatchers("/inventory/**").authenticated()
+						.anyRequest().permitAll()
+				)
+//				.oauth2Login(Customizer.withDefaults()) // Auth0 login flow
 //				.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())); // JWT token validation
-//
-//		return http.build();
-//	}
-//
-//}
+				.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))); // JWT token validation for custom converter to convert claims to roles
+
+		return http.build();
+	}
+
+	// jwt converter for adding claims as roles
+	@Bean
+	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+		converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+			// This claim is same as we configure in okta under Security -> API -> Authorization Server -> default -> Claims tab
+			final List<String> roles = jwt.getClaimAsStringList("MyClaim");
+
+//			System.out.println("Roles are:" + roles);
+//			System.out.println("Claims are:" + jwt.getClaims());
+			if (roles == null) return List.of();
+			// this will convert group Admin to ROLE_ADMIN, Regular Users to ROLE_REGULAR_USERS
+			// so you can use hasRole('ADMIN') and hasRole('REGULAR_USERS')
+			return roles.stream()
+					.map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase().replace(" ", "_")))
+					.collect(Collectors.toList());
+		});
+
+		return converter;
+	}
+
+}

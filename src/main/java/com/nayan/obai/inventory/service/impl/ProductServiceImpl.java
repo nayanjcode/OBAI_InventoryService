@@ -33,6 +33,8 @@ public class ProductServiceImpl implements ProductService
 	@Autowired
 	private ReservationRepository reservationRepository;
 
+	public ProductServiceImpl(){}
+
 	public ProductServiceImpl(RedissonClient redissonClient)
 	{
 		this.redissonClient = redissonClient;

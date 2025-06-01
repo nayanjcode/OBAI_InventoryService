@@ -50,6 +50,15 @@ spring:
 #        provider:
 #          auth0:
 #            issuer-uri: https://dev-zrv8mh7b8k6bay3x.us.auth0.com/
+
+# Security configs for okta to access token and validate
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-93131137.okta.com/oauth2/default
+#          jwk-set-uri: https://your-issuer.com/.well-known/jwks.json # Optional if issuer-uri resolves this
+
   data:
     redis:
       host: localhost
