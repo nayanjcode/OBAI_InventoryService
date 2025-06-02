@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,20 +38,33 @@ public class SecurityConfig
 	// jwt converter for adding claims as roles
 	@Bean
 	public JwtAuthenticationConverter jwtAuthenticationConverter() {
-		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+		final JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
 		converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+			final List<GrantedAuthority> authorities = new ArrayList<>();
+
 			// This claim is same as we configure in okta under Security -> API -> Authorization Server -> default -> Claims tab
 			final List<String> roles = jwt.getClaimAsStringList("MyClaim");
-
-//			System.out.println("Roles are:" + roles);
-//			System.out.println("Claims are:" + jwt.getClaims());
-			if (roles == null) return List.of();
-			// this will convert group Admin to ROLE_ADMIN, Regular Users to ROLE_REGULAR_USERS
-			// so you can use hasRole('ADMIN') and hasRole('REGULAR_USERS')
-			return roles.stream()
-					.map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase().replace(" ", "_")))
-					.collect(Collectors.toList());
+//
+			System.out.println("Roles are:" + roles);
+			System.out.println("Claims are:" + jwt.getClaims());
+			if (roles != null)
+			{
+				// this will convert group Admin to ROLE_ADMIN, Regular Users to ROLE_REGULAR_USERS
+				// so you can use hasRole('ADMIN') and hasRole('REGULAR_USERS')
+				authorities.addAll(roles.stream()
+						.map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase().replace(" ", "_")))
+						.collect(Collectors.toList()));
+			}
+			// Scopes from machine tokens
+			final List<String> scopes = jwt.getClaimAsStringList("scp");
+			System.out.println("Scopes are:" + scopes);
+			if (scopes != null) {
+				authorities.addAll(scopes.stream()
+						.map(scope -> new SimpleGrantedAuthority("SCOPE_" + scope))
+						.collect(Collectors.toList()));
+			}
+			return authorities;
 		});
 
 		return converter;

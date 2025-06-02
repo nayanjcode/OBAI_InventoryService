@@ -24,7 +24,7 @@ public class InventoryController
 	@Autowired
 	private ProductService productService;
 
-	@PreAuthorize("hasRole('REGULAR_USERS')")
+	@PreAuthorize("hasAuthority('SCOPE_internal') || hasRole('REGULAR_USERS')")
 	@GetMapping("/{productId}")
 	public ResponseEntity<Product> getProduct(@PathVariable UUID productId)
 	{
@@ -56,7 +56,7 @@ public class InventoryController
 		return ResponseEntity.ok(products);
 	}
 
-	@PreAuthorize("hasRole('REGULAR_USER')")
+	@PreAuthorize("hasAuthority('SCOPE_internal') || hasRole('REGULAR_USER')")
 	@PostMapping("/validate")
 	public ResponseEntity<Boolean> validateAndReserveProductStock(@RequestBody OrderProduct orderProduct)
 	{

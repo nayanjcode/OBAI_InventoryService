@@ -35,7 +35,8 @@ public class ProductServiceImpl implements ProductService
 
 	public ProductServiceImpl(){}
 
-	public ProductServiceImpl(RedissonClient redissonClient)
+	@Autowired
+	public ProductServiceImpl(final RedissonClient redissonClient)
 	{
 		this.redissonClient = redissonClient;
 	}
