@@ -1,5 +1,7 @@
 package com.nayan.obai.inventory.config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,9 +21,11 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig
 {
+	final Logger logger = LogManager.getLogger("SecurityConfig");
 	@Bean
 	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception
 	{
+		logger.info("Setting filters for security config");
 		http
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/login**", "/oauth2/**", "/actuator/**").permitAll()
@@ -38,6 +42,7 @@ public class SecurityConfig
 	// jwt converter for adding claims as roles
 	@Bean
 	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+		logger.info("Setting jwt converter");
 		final JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
 		converter.setJwtGrantedAuthoritiesConverter(jwt -> {
@@ -46,8 +51,8 @@ public class SecurityConfig
 			// This claim is same as we configure in okta under Security -> API -> Authorization Server -> default -> Claims tab
 			final List<String> roles = jwt.getClaimAsStringList("MyClaim");
 //
-			System.out.println("Roles are:" + roles);
-			System.out.println("Claims are:" + jwt.getClaims());
+			logger.info("Roles are:" + roles);
+			logger.info("Claims are:" + jwt.getClaims());
 			if (roles != null)
 			{
 				// this will convert group Admin to ROLE_ADMIN, Regular Users to ROLE_REGULAR_USERS
@@ -58,7 +63,7 @@ public class SecurityConfig
 			}
 			// Scopes from machine tokens
 			final List<String> scopes = jwt.getClaimAsStringList("scp");
-			System.out.println("Scopes are:" + scopes);
+			logger.info("Scopes are:" + scopes);
 			if (scopes != null) {
 				authorities.addAll(scopes.stream()
 						.map(scope -> new SimpleGrantedAuthority("SCOPE_" + scope))

@@ -2,18 +2,14 @@ package com.nayan.obai.inventory.listener;
 
 import com.nayan.obai.inventory.event.PaymentResultEvent;
 import com.nayan.obai.inventory.service.ProductService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentResultListenerTest
@@ -40,7 +36,7 @@ class PaymentResultListenerTest
 
 		// Assert
 		Mockito.verify(productService, Mockito.times(1)).updateProductStockForSuccessfulOrder(orderId);
-		Mockito.verify(productService, Mockito.never()).rollbackProductStockForUnsuccessfulOrder(orderId);
+		Mockito.verify(productService, Mockito.never()).removeReservedProductStock(orderId);
 	}
 
 	@Test
@@ -53,7 +49,7 @@ class PaymentResultListenerTest
 		listener.handlePaymentSuccess(event);
 
 		// Assert
-		Mockito.verify(productService, Mockito.times(1)).rollbackProductStockForUnsuccessfulOrder(orderId);
+		Mockito.verify(productService, Mockito.times(1)).removeReservedProductStock(orderId);
 		Mockito.verify(productService, Mockito.never()).updateProductStockForSuccessfulOrder(orderId);
 	}
 }

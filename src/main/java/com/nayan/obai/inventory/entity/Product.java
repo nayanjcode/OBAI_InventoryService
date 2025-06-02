@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "Product")
 @EqualsAndHashCode(of={"quantity", "productId"})
+@ToString
 public class Product
 {
 //	// I don't this this id is required. We already have product id

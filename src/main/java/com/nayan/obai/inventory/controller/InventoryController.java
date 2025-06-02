@@ -3,6 +3,8 @@ package com.nayan.obai.inventory.controller;
 import com.nayan.obai.inventory.entity.Product;
 import com.nayan.obai.inventory.rest.OrderProduct;
 import com.nayan.obai.inventory.service.ProductService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import java.util.UUID;
 @RequestMapping("/inventory")
 public class InventoryController
 {
+	final Logger logger = LogManager.getLogger("InventoryController");
+
 	@Autowired
 	private ProductService productService;
 
@@ -28,6 +32,7 @@ public class InventoryController
 	@GetMapping("/{productId}")
 	public ResponseEntity<Product> getProduct(@PathVariable UUID productId)
 	{
+		logger.debug("request for getProduct");
 		final Product product = productService.getProduct(productId);
 		return ResponseEntity.ok(product);
 	}
@@ -36,6 +41,7 @@ public class InventoryController
 	@PostMapping("/")
 	public ResponseEntity<Product> saveProduct(@RequestBody Product product)
 	{
+		logger.debug("request for saveProduct");
 //		this id handling is not required as Id itself does not seem to be required
 //		try
 //		{
@@ -52,6 +58,7 @@ public class InventoryController
 	@GetMapping("/")
 	public ResponseEntity<List<Product>> getProducts()
 	{
+		logger.debug("request for get all products");
 		final List<Product> products = productService.getAllProducts();
 		return ResponseEntity.ok(products);
 	}
@@ -60,6 +67,7 @@ public class InventoryController
 	@PostMapping("/validate")
 	public ResponseEntity<Boolean> validateAndReserveProductStock(@RequestBody OrderProduct orderProduct)
 	{
+		logger.debug("request for validating product and reserving stock by locking");
 		boolean isValid = productService.validateAndReserveProduct(orderProduct);
 		return ResponseEntity.status(HttpStatus.OK).body(isValid);
 	}

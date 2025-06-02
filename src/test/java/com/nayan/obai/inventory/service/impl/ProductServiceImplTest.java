@@ -216,7 +216,7 @@ class ProductServiceImplTest
 	void shouldDeleteReservationOnOrderFailure() {
 		final UUID orderId = UUID.randomUUID();
 
-		productService.rollbackProductStockForUnsuccessfulOrder(orderId);
+		productService.removeReservedProductStock(orderId);
 
 		Mockito.verify(reservationRepository).deleteByOrderId(orderId);
 	}

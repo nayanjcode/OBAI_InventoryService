@@ -20,7 +20,7 @@ public class PaymentResultListener
 		if(event.isSuccessful()){
 			productService.updateProductStockForSuccessfulOrder(event.getOrderId());
 		} else {
-			productService.rollbackProductStockForUnsuccessfulOrder(event.getOrderId());
+			productService.removeReservedProductStock(event.getOrderId());
 		}
 	}
 }

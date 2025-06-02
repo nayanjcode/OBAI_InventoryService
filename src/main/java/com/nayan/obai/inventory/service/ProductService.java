@@ -18,6 +18,6 @@ public interface ProductService
 
 	void updateProductStockForSuccessfulOrder(final UUID orderId);
 
-	void rollbackProductStockForUnsuccessfulOrder(final UUID orderId);
+	void removeReservedProductStock(final UUID orderId);
 
 }
